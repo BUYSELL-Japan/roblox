@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "pages:build": "next build && npx @cloudflare/next-on-pages"
+    "pages:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@react-spring/three": "^9.7.3",

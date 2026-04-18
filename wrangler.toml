@@ -1,0 +1,6 @@
+name = "roblox-ultimate-flex"
+compatibility_date = "2024-04-03"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# 必要に応じて環境変数をここに記述
