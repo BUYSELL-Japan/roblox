@@ -52,15 +52,15 @@ export default function MainApp() {
             </button>
           )}
           
-          <div className="flex flex-col min-w-0">
+          <div className="flex flex-col min-w-0 justify-center">
             {profile ? (
               <>
-                <h1 className="text-[11px] font-black truncate text-white uppercase leading-none tracking-tight">
+                <h1 className="text-sm font-black truncate text-white uppercase leading-none tracking-tight">
                   {profile.displayName}
                 </h1>
-                <div className="flex items-center gap-1 mt-1 opacity-60">
-                   <Cpu size={8} className={isLoading ? 'animate-spin text-yellow-500' : 'text-cyan-500'} />
-                   <p className="text-[6px] font-bold tracking-[0.2em] uppercase">
+                <div className="flex items-center gap-1 mt-1.5 opacity-70">
+                   <Cpu size={10} className={isLoading ? 'animate-spin text-yellow-500' : 'text-cyan-500'} />
+                   <p className="text-[8px] font-bold tracking-[0.1em] uppercase">
                      {isLoading ? 'Scanning Assets' : 'System Secure'}
                    </p>
                 </div>
