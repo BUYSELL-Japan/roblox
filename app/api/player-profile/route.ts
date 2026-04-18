@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 // Batch thumbnail fetching (max 100 IDs per request)
 async function fetchThumbnailsBatch(ids: (number | string)[], type: 'assets' | 'headshots'): Promise<Record<string, string>> {
   const result: Record<string, string> = {};

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 // Roblox APIs are public for user info, but have different subdomains.
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
