@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
@@ -33,36 +33,55 @@ export async function GET(request: Request) {
   const userId = searchParams.get('userId') || '4460761705';
 
   try {
+    const safeFetch = (url: string, options?: RequestInit) => 
+      fetch(url, options).catch(e => {
+        console.error(`Fetch failed for ${url}:`, e);
+        return null; // Return null instead of throwing on network error
+      });
+
     // 1. Fetch BASIC profile and count immediately to keep it fast
     const [userRes, avatarRes, avatarInfoRes, wearingRes, friendsCountRes, groupsRes, followersRes, followingRes, gamesRes, outlitsRes, usernameHistoryRes] = await Promise.all([
-      fetch(`https://users.roproxy.com/v1/users/${userId}`),
-      fetch(`https://thumbnails.roproxy.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png&isCircular=false`),
-      fetch(`https://avatar.roproxy.com/v1/users/${userId}/avatar`),
-      fetch(`https://avatar.roproxy.com/v1/users/${userId}/currently-wearing`),
-      fetch(`https://friends.roproxy.com/v1/users/${userId}/friends/count`), 
-      fetch(`https://groups.roproxy.com/v1/users/${userId}/groups/roles`),
-      fetch(`https://followings.roproxy.com/v1/users/${userId}/followers/count`),
-      fetch(`https://followings.roproxy.com/v1/users/${userId}/followings/count`),
-      fetch(`https://games.roproxy.com/v2/users/${userId}/games?accessFilter=Public&limit=50&sortOrder=Asc`),
-      fetch(`https://avatar.roproxy.com/v1/users/${userId}/outfits?itemsPerPage=50`),
-      fetch(`https://users.roproxy.com/v1/users/${userId}/username-history?limit=10&sortOrder=Asc`),
+      safeFetch(`https://users.roproxy.com/v1/users/${userId}`),
+      safeFetch(`https://thumbnails.roproxy.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png&isCircular=false`),
+      safeFetch(`https://avatar.roproxy.com/v1/users/${userId}/avatar`),
+      safeFetch(`https://avatar.roproxy.com/v1/users/${userId}/currently-wearing`),
+      safeFetch(`https://friends.roproxy.com/v1/users/${userId}/friends/count`), 
+      safeFetch(`https://groups.roproxy.com/v1/users/${userId}/groups/roles`),
+      safeFetch(`https://followings.roproxy.com/v1/users/${userId}/followers/count`),
+      safeFetch(`https://followings.roproxy.com/v1/users/${userId}/followings/count`),
+      safeFetch(`https://games.roproxy.com/v2/users/${userId}/games?accessFilter=Public&limit=50&sortOrder=Asc`),
+      safeFetch(`https://avatar.roproxy.com/v1/users/${userId}/outfits?itemsPerPage=50`),
+      safeFetch(`https://users.roproxy.com/v1/users/${userId}/username-history?limit=10&sortOrder=Asc`),
     ]);
 
-    const userData = await userRes.json();
+    if (!userRes) {
+      throw new Error("Network error fetching user from RoProxy.");
+    }
+
+    let userData;
+    try {
+      if (!userRes.ok && userRes.status !== 404) {
+        throw new Error(`RoProxy User API returned status: ${userRes.status}`);
+      }
+      userData = await userRes.json();
+    } catch (e: any) {
+      throw new Error(`Failed to parse user data: ${e.message}`);
+    }
+
     if (userData.errors || (userData.isBanned === undefined && !userData.name)) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const avatarData = avatarRes.ok ? await avatarRes.json() : null;
-    const avatarInfo = avatarInfoRes.ok ? await avatarInfoRes.json() : null;
-    const wearingData = wearingRes.ok ? await wearingRes.json() : null;
-    const friendsCountData = friendsCountRes.ok ? await friendsCountRes.json() : { count: 0 };
-    const groupsData = groupsRes.ok ? await groupsRes.json() : null;
-    const followersData = followersRes.ok ? await followersRes.json() : null;
-    const followingData = followingRes.ok ? await followingRes.json() : null;
-    const gamesData = gamesRes.ok ? await gamesRes.json() : null;
-    const outlitsData = outlitsRes.ok ? await outlitsRes.json() : null;
-    const usernameHistory = usernameHistoryRes.ok ? await usernameHistoryRes.json() : null;
+    const avatarData = (avatarRes && avatarRes.ok) ? await avatarRes.json().catch(()=>null) : null;
+    const avatarInfo = (avatarInfoRes && avatarInfoRes.ok) ? await avatarInfoRes.json().catch(()=>null) : null;
+    const wearingData = (wearingRes && wearingRes.ok) ? await wearingRes.json().catch(()=>null) : null;
+    const friendsCountData = (friendsCountRes && friendsCountRes.ok) ? await friendsCountRes.json().catch(()=>null) : { count: 0 };
+    const groupsData = (groupsRes && groupsRes.ok) ? await groupsRes.json().catch(()=>null) : null;
+    const followersData = (followersRes && followersRes.ok) ? await followersRes.json().catch(()=>null) : null;
+    const followingData = (followingRes && followingRes.ok) ? await followingRes.json().catch(()=>null) : null;
+    const gamesData = (gamesRes && gamesRes.ok) ? await gamesRes.json().catch(()=>null) : null;
+    const outlitsData = (outlitsRes && outlitsRes.ok) ? await outlitsRes.json().catch(()=>null) : null;
+    const usernameHistory = (usernameHistoryRes && usernameHistoryRes.ok) ? await usernameHistoryRes.json().catch(()=>null) : null;
 
     // --- Asset Detection ---
     const assetIds = (wearingData?.assetIds ?? []).map(String).filter(Boolean);
@@ -195,9 +214,9 @@ export async function GET(request: Request) {
       games,
       usernameHistory: (usernameHistory?.data ?? []).map((h: any) => h.name),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('API Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error?.message || 'Internal Server Error' }, { status: 500 });
   }
 }
 
