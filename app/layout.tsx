@@ -8,6 +8,9 @@ const outfit = Outfit({ subsets: ["latin"], variable: '--font-outfit' });
 export const metadata: Metadata = {
   title: "RobloxScan — Profile Explorer",
   description: "Explore Roblox profiles, outfits, friends, groups and catalog without logging in.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
