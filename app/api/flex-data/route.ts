@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
@@ -13,19 +13,19 @@ export async function GET(request: Request) {
 
   try {
     // 1. Fetch User Profile Info
-    const userRes = await fetch(`https://users.roblox.com/v1/users/${userId}`);
+    const userRes = await fetch(`https://users.roproxy.com/v1/users/${userId}`);
     const userData = await userRes.json();
 
     // 2. Fetch User Badges
-    const badgesRes = await fetch(`https://badges.roblox.com/v1/users/${userId}/badges/awarded?limit=10&sortOrder=Desc`);
+    const badgesRes = await fetch(`https://badges.roproxy.com/v1/users/${userId}/badges/awarded?limit=10&sortOrder=Desc`);
     const badgesData = badgesRes.ok ? await badgesRes.json() : { data: [] };
 
     // 3. Fetch Friends count
-    const friendsRes = await fetch(`https://friends.roblox.com/v1/users/${userId}/friends/count`);
+    const friendsRes = await fetch(`https://friends.roproxy.com/v1/users/${userId}/friends/count`);
     const friendsData = friendsRes.ok ? await friendsRes.json() : { count: 0 };
 
     // 4. Fetch 2D High-Res Avatar image
-    const avatarRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png&isCircular=false`);
+    const avatarRes = await fetch(`https://thumbnails.roproxy.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png&isCircular=false`);
     let avatarImageUrl = null;
     
     if (avatarRes.ok) {
@@ -50,3 +50,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+

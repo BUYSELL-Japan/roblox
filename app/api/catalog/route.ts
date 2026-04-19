@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       ...(cursor && { cursor }),
     });
 
-    const searchRes = await fetch(`https://catalog.roblox.com/v1/search/items?${params}`);
+    const searchRes = await fetch(`https://catalog.roproxy.com/v1/search/items?${params}`);
     if (!searchRes.ok) throw new Error('Catalog search failed');
     const searchData = await searchRes.json();
 
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     let thumbnails: Record<number, string> = {};
     if (assetIds) {
       const thumbRes = await fetch(
-        `https://thumbnails.roblox.com/v1/assets?assetIds=${assetIds}&size=150x150&format=Png&isCircular=false`
+        `https://thumbnails.roproxy.com/v1/assets?assetIds=${assetIds}&size=150x150&format=Png&isCircular=false`
       );
       if (thumbRes.ok) {
         const thumbData = await thumbRes.json();
@@ -56,3 +56,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Failed to fetch catalog' }, { status: 500 });
   }
 }
+

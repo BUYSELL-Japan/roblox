@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
@@ -9,8 +9,8 @@ async function fetchThumbnailsBatch(ids: (number | string)[], type: 'assets' | '
   for (let i = 0; i < ids.length; i += chunkSize) {
     const chunk = ids.slice(i, i + chunkSize).join(',');
     const url = type === 'assets'
-      ? `https://thumbnails.roblox.com/v1/assets?assetIds=${chunk}&size=150x150&format=Png&isCircular=false`
-      : `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${chunk}&size=150x150&format=Png&isCircular=true`;
+      ? `https://thumbnails.roproxy.com/v1/assets?assetIds=${chunk}&size=150x150&format=Png&isCircular=false`
+      : `https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=${chunk}&size=150x150&format=Png&isCircular=true`;
     try {
       const res = await fetch(url);
       if (res.ok) {
@@ -35,17 +35,17 @@ export async function GET(request: Request) {
   try {
     // 1. Fetch BASIC profile and count immediately to keep it fast
     const [userRes, avatarRes, avatarInfoRes, wearingRes, friendsCountRes, groupsRes, followersRes, followingRes, gamesRes, outlitsRes, usernameHistoryRes] = await Promise.all([
-      fetch(`https://users.roblox.com/v1/users/${userId}`),
-      fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png&isCircular=false`),
-      fetch(`https://avatar.roblox.com/v1/users/${userId}/avatar`),
-      fetch(`https://avatar.roblox.com/v1/users/${userId}/currently-wearing`),
-      fetch(`https://friends.roblox.com/v1/users/${userId}/friends/count`), 
-      fetch(`https://groups.roblox.com/v1/users/${userId}/groups/roles`),
-      fetch(`https://followings.roblox.com/v1/users/${userId}/followers/count`),
-      fetch(`https://followings.roblox.com/v1/users/${userId}/followings/count`),
-      fetch(`https://games.roblox.com/v2/users/${userId}/games?accessFilter=Public&limit=50&sortOrder=Asc`),
-      fetch(`https://avatar.roblox.com/v1/users/${userId}/outfits?itemsPerPage=50`),
-      fetch(`https://users.roblox.com/v1/users/${userId}/username-history?limit=10&sortOrder=Asc`),
+      fetch(`https://users.roproxy.com/v1/users/${userId}`),
+      fetch(`https://thumbnails.roproxy.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png&isCircular=false`),
+      fetch(`https://avatar.roproxy.com/v1/users/${userId}/avatar`),
+      fetch(`https://avatar.roproxy.com/v1/users/${userId}/currently-wearing`),
+      fetch(`https://friends.roproxy.com/v1/users/${userId}/friends/count`), 
+      fetch(`https://groups.roproxy.com/v1/users/${userId}/groups/roles`),
+      fetch(`https://followings.roproxy.com/v1/users/${userId}/followers/count`),
+      fetch(`https://followings.roproxy.com/v1/users/${userId}/followings/count`),
+      fetch(`https://games.roproxy.com/v2/users/${userId}/games?accessFilter=Public&limit=50&sortOrder=Asc`),
+      fetch(`https://avatar.roproxy.com/v1/users/${userId}/outfits?itemsPerPage=50`),
+      fetch(`https://users.roproxy.com/v1/users/${userId}/username-history?limit=10&sortOrder=Asc`),
     ]);
 
     const userData = await userRes.json();
@@ -67,12 +67,9 @@ export async function GET(request: Request) {
     // --- Asset Detection ---
     const assetIds = (wearingData?.assetIds ?? []).map(String).filter(Boolean);
     
-    // 【重要】もしassetIdsが空の場合、Roblox APIの制限の可能性があるため、ログを出して警告する
-    if (assetIds.length === 0) {
+    // 縲宣㍾隕√代ｂ縺預ssetIds縺檎ｩｺ縺ｮ蝣ｴ蜷医ヽoblox API縺ｮ蛻ｶ髯舌・蜿ｯ閭ｽ諤ｧ縺後≠繧九◆繧√√Ο繧ｰ繧貞・縺励※隴ｦ蜻翫☆繧・    if (assetIds.length === 0) {
       console.warn(`[API Warning] No assets returned for user ${userId}. Roblox might be rate-limiting.`);
-      // 空のままだとフロントエンドの表示が消えるので、以前のデータを保持させるためにエラーを返すか、
-      // あるいは特別なフラグを立てることも検討
-    }
+      // 遨ｺ縺ｮ縺ｾ縺ｾ縺縺ｨ繝輔Ο繝ｳ繝医お繝ｳ繝峨・陦ｨ遉ｺ縺梧ｶ医∴繧九・縺ｧ縲∽ｻ･蜑阪・繝・・繧ｿ繧剃ｿ晄戟縺輔○繧九◆繧√↓繧ｨ繝ｩ繝ｼ繧定ｿ斐☆縺九・      // 縺ゅｋ縺・・迚ｹ蛻･縺ｪ繝輔Λ繧ｰ繧堤ｫ九※繧九％縺ｨ繧よ､懆ｨ・    }
 
     // Avatar image
     const rawAvatarUrl = avatarData?.data?.[0]?.imageUrl ?? null;
@@ -101,7 +98,7 @@ export async function GET(request: Request) {
     if (savedOutfits.length > 0) {
       const outfitIds = savedOutfits.map((o: any) => o.id).join(',');
       const outfitThumbRes = await fetch(
-        `https://thumbnails.roblox.com/v1/users/outfits?userOutfitIds=${outfitIds}&size=150x150&format=Png&isCircular=false`
+        `https://thumbnails.roproxy.com/v1/users/outfits?userOutfitIds=${outfitIds}&size=150x150&format=Png&isCircular=false`
       );
       if (outfitThumbRes.ok) {
         const ot = await outfitThumbRes.json();
@@ -114,7 +111,7 @@ export async function GET(request: Request) {
     }
 
     // Friends
-    const basicFriendsRes = await fetch(`https://friends.roblox.com/v1/users/${userId}/friends`);
+    const basicFriendsRes = await fetch(`https://friends.roproxy.com/v1/users/${userId}/friends`);
     const basicFriendsData = basicFriendsRes.ok ? await basicFriendsRes.json() : { data: [] };
     const friends = basicFriendsData.data || [];
     let friendsWithAvatars: any[] = [];
@@ -125,7 +122,7 @@ export async function GET(request: Request) {
       
       const [thumbMap, userInfoRes] = await Promise.all([
         fetchThumbnailsBatch(displayIds, 'headshots'),
-        fetch('https://users.roblox.com/v1/users', {
+        fetch('https://users.roproxy.com/v1/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userIds: displayIds, excludeBannedUsers: false }),
@@ -161,7 +158,7 @@ export async function GET(request: Request) {
 
     if (games.length > 0) {
       const universeIds = games.map((g: any) => g.id).join(',');
-      const gameThumbRes = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeIds}&size=150x150&format=Png&isCircular=false`);
+      const gameThumbRes = await fetch(`https://thumbnails.roproxy.com/v1/games/icons?universeIds=${universeIds}&size=150x150&format=Png&isCircular=false`);
       if (gameThumbRes.ok) {
         const gt = await gameThumbRes.json();
         const thumbMap = new Map<number, string>((gt.data ?? []).map((t: any) => [t.targetId, t.imageUrl]));
@@ -203,3 +200,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
